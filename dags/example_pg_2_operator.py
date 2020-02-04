@@ -17,11 +17,11 @@ dag = DAG(
 
 sql = \
 """
-DROP TABLE IF EXISTS holy;
-CREATE TABLE holy (
-   holy_id INT NOT NULL PRIMARY KEY,
-   firstname VARCHAR (50),
-   lastname VARCHAR (50)
+DROP TABLE IF EXISTS game;
+CREATE TABLE game (
+   game_id INT NOT NULL PRIMARY KEY,
+   desc VARCHAR (50),
+   name VARCHAR (50)
 );
 """
 
