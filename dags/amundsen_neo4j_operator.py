@@ -56,8 +56,6 @@ def create_job(transformer=AirflowTransformer()):
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.RAW_VALUE_TRANSFORMER):
             'databuilder.transformer.base_transformer.NoopTransformer',
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.TOPIC_NAME_LIST): ['airflow-sql'],
-        'extractor.kafka_source.{}'.format(KafkaSourceExtractor.CONSUMER_TOTAL_TIMEOUT_SEC): 30,
-        'extractor.kafka_source.{}'.format(KafkaSourceExtractor.CONSUMER_POLL_TIMEOUT_SEC): 5,
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.TRANSFORMER_THROWN_EXCEPTION): True,
         'loader.filesystem_csv_neo4j.{}'.format(FsNeo4jCSVLoader.NODE_DIR_PATH):
             node_files_folder,
@@ -78,9 +76,13 @@ def create_job(transformer=AirflowTransformer()):
         'publisher.neo4j.{}'.format(neo4j_csv_publisher.JOB_PUBLISH_TAG):
             'airflow-sql',  # should use unique tag here like {ds}
     })
+
+    publisher = Neo4jCsvPublisher()
+    publisher.register_call_back(kafka_extractor)
+
     job = DefaultJob(conf=job_config,
                      task=task,
-                     publisher=Neo4jCsvPublisher())
+                     publisher=publisher)
     job.launch()
 
 dag_args = {
