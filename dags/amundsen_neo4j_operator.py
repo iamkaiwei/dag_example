@@ -13,7 +13,7 @@ from databuilder.loader.file_system_neo4j_csv_loader import FsNeo4jCSVLoader
 
 from databuilder.publisher import neo4j_csv_publisher
 from databuilder.publisher.neo4j_csv_publisher import Neo4jCsvPublisher
-from databuilder.task.task import DefaultTask
+from databuilder.task.airflow_task import AirflowTask
 from databuilder.transformer.base_transformer import NoopTransformer
 from databuilder.transformer.airflow_transformer import AirflowTransformer
 from databuilder.extractor.kafka_source_extractor import KafkaSourceExtractor
@@ -39,7 +39,7 @@ def create_job(transformer=AirflowTransformer()):
 
     kafka_extractor = KafkaSourceExtractor()
     csv_loader = FsNeo4jCSVLoader()
-    task = DefaultTask(
+    task = AirflowTask(
         extractor=kafka_extractor,
         loader=csv_loader,
         transformer=transformer,
