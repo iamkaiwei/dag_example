@@ -20,7 +20,7 @@ sql = \
 DROP TABLE IF EXISTS game;
 CREATE TABLE game (
    game_id INT NOT NULL PRIMARY KEY,
-   goblin VARCHAR (50),
+   desc VARCHAR (50),
    name VARCHAR (50)
 );
 """
