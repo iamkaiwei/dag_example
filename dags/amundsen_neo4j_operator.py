@@ -26,6 +26,8 @@ neo4j_password = os.getenv('NEO_PASS', 'test')
 NEO4J_ENDPOINT = 'bolt://{}:7687'.format(neo_host)
 neo4j_endpoint = NEO4J_ENDPOINT
 
+kafka_group_id = os.getenv('KAFKA_GROUP_ID', 'amundsen')
+
 def random_string(stringLength=8):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
@@ -44,7 +46,7 @@ def create_job(transformer=AirflowTransformer()):
     )
 
     consumer_config = {
-        '"group.id"': random_string(),
+        '"group.id"': kafka_group_id,
         '"enable.auto.commit"': False,
         '"bootstrap.servers"': 'bootstrap.kafka.svc.cluster.local:9092',
         '"auto.offset.reset"': 'earliest',
