@@ -205,13 +205,13 @@ dag = DAG(
     **dag_args,
 )
 
-amundsen_databuilder_es_job = PythonOperator(
+amundsen_table_es_job = PythonOperator(
     dag=dag,
     task_id='amundsen_table_es_job',
     python_callable=run_table_es_job
 )
 
-amundsen_databuilder_es_job = PythonOperator(
+amundsen_user_es_job = PythonOperator(
     dag=dag,
     task_id='amundsen_user_es_job',
     python_callable=run_user_es_job
