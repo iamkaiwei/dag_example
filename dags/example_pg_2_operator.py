@@ -18,9 +18,9 @@ dag = DAG(
 
 sql = \
 """
-DROP TABLE IF EXISTS game;
-CREATE TABLE game (
-   game_id INT NOT NULL PRIMARY KEY,
+DROP TABLE IF EXISTS sensei;
+CREATE TABLE sensei (
+   sensei_id INT NOT NULL PRIMARY KEY,
    tung VARCHAR (50),
    name VARCHAR (50)
 );
