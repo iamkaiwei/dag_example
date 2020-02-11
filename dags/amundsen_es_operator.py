@@ -1,5 +1,6 @@
 import os
 import uuid
+import textwrap
 
 from datetime import datetime, timedelta
 from elasticsearch import Elasticsearch
@@ -85,7 +86,97 @@ def create_es_job(elasticsearch_index_alias='table_search_index',
     job = DefaultJob(conf=job_config,
                      task=task,
                      publisher=ElasticsearchPublisher())
-    job.launch()
+    return job
+
+def run_table_es_job():
+    table_job = create_es_job()
+    table_job.launch()
+
+def run_user_es_job():
+    user_cypher_query = textwrap.dedent(
+        """
+        MATCH (user:User)
+        OPTIONAL MATCH (user)-[read:READ]->(a)
+        OPTIONAL MATCH (user)-[own:OWNER_OF]->(b)
+        OPTIONAL MATCH (user)-[follow:FOLLOWED_BY]->(c)
+        OPTIONAL MATCH (user)-[manage_by:MANAGE_BY]->(manager)
+        with user, a, b, c, read, own, follow, manager
+        where user.full_name is not null
+        return user.email as email, user.first_name as first_name, user.last_name as last_name,
+        user.full_name as name, user.github_username as github_username, user.team_name as team_name,
+        user.employee_type as employee_type, manager.email as manager_email, user.slack_id as slack_id,
+        user.is_active as is_active,
+        REDUCE(sum_r = 0, r in COLLECT(DISTINCT read)| sum_r + r.read_count) AS total_read,
+        count(distinct b) as total_own,
+        count(distinct c) AS total_follow
+        order by user.email
+        """
+    )
+
+    user_elasticsearch_mapping = """
+        {
+          "mappings":{
+            "user":{
+              "properties": {
+                "email": {
+                  "type":"text",
+                  "analyzer": "simple",
+                  "fields": {
+                    "raw": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "first_name": {
+                  "type":"text",
+                  "analyzer": "simple",
+                  "fields": {
+                    "raw": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "last_name": {
+                  "type":"text",
+                  "analyzer": "simple",
+                  "fields": {
+                    "raw": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "name": {
+                  "type":"text",
+                  "analyzer": "simple",
+                  "fields": {
+                    "raw": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "total_read":{
+                  "type": "long"
+                },
+                "total_own": {
+                  "type": "long"
+                },
+                "total_follow": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        }
+    """
+
+    user_job = create_es_job(
+        elasticsearch_index_alias='user_search_index',
+        elasticsearch_doc_type_key='user',
+        model_name='databuilder.models.user_elasticsearch_document.UserESDocument',
+        cypher_query=user_cypher_query,
+        elasticsearch_mapping=user_elasticsearch_mapping,
+    )
+    user_job.launch()
 
 dag_args = {
     'concurrency': 10,
@@ -116,6 +207,12 @@ dag = DAG(
 
 amundsen_databuilder_es_job = PythonOperator(
     dag=dag,
-    task_id='amundsen_databuilder_es_job',
-    python_callable=create_es_job
+    task_id='amundsen_table_es_job',
+    python_callable=run_table_es_job
+)
+
+amundsen_databuilder_es_job = PythonOperator(
+    dag=dag,
+    task_id='amundsen_user_es_job',
+    python_callable=run_user_es_job
 )

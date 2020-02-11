@@ -7,6 +7,7 @@ two_days_ago = datetime.combine(datetime.today() - timedelta(2),
 args = {
     'owner': 'airflow',
     'start_date': two_days_ago,
+    'email': 'tung@flownote.ai'
 }
 
 dag = DAG(

@@ -17,7 +17,6 @@ from databuilder.task.airflow_task import AirflowTask
 from databuilder.transformer.base_transformer import NoopTransformer
 from databuilder.transformer.airflow_transformer import AirflowTransformer
 from databuilder.extractor.kafka_source_extractor import KafkaSourceExtractor
-from databuilder.models.multi_table_metadata import MultiTableMetadata
 
 neo_host = os.getenv('NEO_HOST', 'neo4j.default.svc.cluster.local')
 neo4j_user = os.getenv('NEO_USER', 'neo4j')
@@ -26,7 +25,9 @@ neo4j_password = os.getenv('NEO_PASS', 'test')
 NEO4J_ENDPOINT = 'bolt://{}:7687'.format(neo_host)
 neo4j_endpoint = NEO4J_ENDPOINT
 
+kafka_brokers = os.getenv('KAFKA_BROKERS', 'bootstrap.kafka.svc.cluster.local:9092')
 kafka_group_id = os.getenv('KAFKA_GROUP_ID', 'amundsen')
+kafka_topics = [os.getenv('KAFKA_TOPIC', 'airflow-sql')]
 
 def random_string(stringLength=8):
     letters = string.ascii_lowercase
@@ -48,14 +49,14 @@ def create_job(transformer=AirflowTransformer()):
     consumer_config = {
         '"group.id"': kafka_group_id,
         '"enable.auto.commit"': False,
-        '"bootstrap.servers"': 'bootstrap.kafka.svc.cluster.local:9092',
+        '"bootstrap.servers"': kafka_brokers,
         '"auto.offset.reset"': 'earliest',
     }
     job_config = ConfigFactory.from_dict({
         'extractor.kafka_source.consumer_config': consumer_config,
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.RAW_VALUE_TRANSFORMER):
             'databuilder.transformer.base_transformer.NoopTransformer',
-        'extractor.kafka_source.{}'.format(KafkaSourceExtractor.TOPIC_NAME_LIST): ['airflow-sql'],
+        'extractor.kafka_source.{}'.format(KafkaSourceExtractor.TOPIC_NAME_LIST): kafka_topics,
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.TRANSFORMER_THROWN_EXCEPTION): True,
         'loader.filesystem_csv_neo4j.{}'.format(FsNeo4jCSVLoader.NODE_DIR_PATH):
             node_files_folder,
@@ -74,7 +75,7 @@ def create_job(transformer=AirflowTransformer()):
         'publisher.neo4j.{}'.format(neo4j_csv_publisher.NEO4J_PASSWORD):
             neo4j_password,
         'publisher.neo4j.{}'.format(neo4j_csv_publisher.JOB_PUBLISH_TAG):
-            'airflow-sql',  # should use unique tag here like {ds}
+            random_string(),  # should use unique tag here like {ds}
     })
 
     publisher = Neo4jCsvPublisher()
@@ -96,9 +97,7 @@ default_args = {
     'owner': 'amundsen',
     'start_date': two_days_ago,
     'depends_on_past': False,
-    'email': [''],
-    'retries': 3,
-    'retry_delay': timedelta(minutes=5)
+    'email': ['']
 }
 
 dag = DAG(
