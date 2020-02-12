@@ -33,7 +33,7 @@ def random_string(stringLength=8):
     letters = string.ascii_lowercase
     return ''.join(random.choice(letters) for i in range(stringLength))
 
-def create_job(transformer=AirflowTransformer()):
+def create_job():
     tmp_folder = '/var/tmp/amundsen/{}'.format(random_string())
     node_files_folder = '{tmp_folder}/nodes'.format(tmp_folder=tmp_folder)
     relationship_files_folder = '{tmp_folder}/relationships'.format(tmp_folder=tmp_folder)
@@ -43,7 +43,6 @@ def create_job(transformer=AirflowTransformer()):
     task = AirflowTask(
         extractor=kafka_extractor,
         loader=csv_loader,
-        transformer=transformer,
     )
 
     consumer_config = {
@@ -55,7 +54,7 @@ def create_job(transformer=AirflowTransformer()):
     job_config = ConfigFactory.from_dict({
         'extractor.kafka_source.consumer_config': consumer_config,
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.RAW_VALUE_TRANSFORMER):
-            'databuilder.transformer.base_transformer.NoopTransformer',
+            'databuilder.transformer.airflow_transformer.AirflowTransformer',
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.TOPIC_NAME_LIST): kafka_topics,
         'extractor.kafka_source.{}'.format(KafkaSourceExtractor.TRANSFORMER_THROWN_EXCEPTION): True,
         'loader.filesystem_csv_neo4j.{}'.format(FsNeo4jCSVLoader.NODE_DIR_PATH):

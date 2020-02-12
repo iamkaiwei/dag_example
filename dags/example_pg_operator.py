@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 two_days_ago = datetime.combine(datetime.today() - timedelta(2),
                                   datetime.min.time())
 args = {
-    'owner': 'airflow',
+    'owner': 'tung',
     'start_date': two_days_ago,
     'email': 'tung@flownote.ai'
 }
