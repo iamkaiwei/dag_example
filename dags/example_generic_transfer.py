@@ -16,7 +16,7 @@ dag = DAG(
     schedule_interval='0 0 * * *'
 )
 
-sql = "SELECT * FROM game;"
+sql = "SELECT * FROM holy;"
 
 generic_transfer = GenericTransfer(
     task_id='generic_transfer',
