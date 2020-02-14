@@ -18,7 +18,8 @@ default_args = {
 dag = DAG(
     dag_id='kubernetes_sample',
     default_args=default_args,
-    schedule_interval=timedelta(minutes=30)
+    schedule_interval=timedelta(minutes=30),
+    catchup=False
 )
 
 k8s_operator = KubernetesPodOperator(

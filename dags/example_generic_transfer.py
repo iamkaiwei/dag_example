@@ -13,7 +13,8 @@ args = {
 dag = DAG(
     dag_id='example_generic_transfer',
     default_args=args,
-    schedule_interval='0 0 * * *'
+    schedule_interval='0 0 * * *',
+    catchup=False
 )
 
 sql = "SELECT * FROM holy;"

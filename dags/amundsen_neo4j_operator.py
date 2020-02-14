@@ -87,7 +87,8 @@ def create_job():
 
 dag_args = {
     # 4AM, 4PM PST
-    'schedule_interval': '@once'
+    'schedule_interval': '@once',
+    'catchup': False
 }
 
 two_days_ago = datetime.combine(datetime.today() - timedelta(2), datetime.min.time())
