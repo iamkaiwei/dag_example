@@ -2,6 +2,11 @@ from airflow.operators.bash_operator import BashOperator
 from airflow.models import DAG
 from airflow.utils.dates import days_ago
 from datetime import timedelta
+from airflow.lineage.datasets import DataSet
+
+class Table(DataSet):
+    type_name = "sql_table"
+    attributes = ["database", "schema", "cluster", "table"]
 
 args = {
     'owner': 'Airflow',
@@ -15,8 +20,8 @@ dag = DAG(
     catchup=False
 )
 
-holy = { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': 'holy' }
-sensei = { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': 'sensei' }
+holy = Table('holy', { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': 'holy' })
+sensei = Table('sensei', { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': 'sensei' })
 
 run_this = BashOperator(
     task_id='run_me_first', bash_command='echo 1', dag=dag,
