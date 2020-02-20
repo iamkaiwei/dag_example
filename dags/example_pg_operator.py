@@ -19,18 +19,20 @@ dag = DAG(
 
 sql = \
 """
-DROP TABLE IF EXISTS holy;
-CREATE TABLE holy (
-   holy_id INT NOT NULL PRIMARY KEY,
+DROP TABLE IF EXISTS {table_name};
+CREATE TABLE {table_name} (
+   {table_name}_id INT NOT NULL PRIMARY KEY,
    firstname VARCHAR (50),
    lastname VARCHAR (50)
 );
 """
+tables = ['one', 'two', 'three']
 
-run_this_alter = PostgresOperator(
-    task_id='run_this_alter',
-    dag=dag,
-    postgres_conn_id='airflow_pg',
-    sql=sql,
-    database='airflow',
-)
+for table in tables:
+  operator = PostgresOperator(
+      task_id='create_{}'.format(table),
+      dag=dag,
+      postgres_conn_id='airflow_pg',
+      sql=sql.format(table_name=table),
+      database='airflow',
+  )

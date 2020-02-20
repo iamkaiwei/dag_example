@@ -9,8 +9,9 @@ class Table(DataSet):
     attributes = ["database", "schema", "cluster", "table"]
 
 args = {
-    'owner': 'Airflow',
-    'start_date': days_ago(2)
+    'owner': 'Tung',
+    'start_date': days_ago(2),
+    'email': 'tung@flownote.ai'
 }
 
 dag = DAG(
@@ -20,11 +21,22 @@ dag = DAG(
     catchup=False
 )
 
-holy = Table('holy', { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': 'holy' })
-sensei = Table('sensei', { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': 'sensei' })
+datasets = {}
+tables = ['one', 'two', 'three']
+for table in tables:
+    data = { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': table }
+    datasets[table] = Table(table, data)
 
 run_this = BashOperator(
     task_id='run_me_first', bash_command='echo 1', dag=dag,
-    inlets={"datasets": [holy]},
-    outlets={"datasets": [sensei]}
+    inlets={"datasets": [datasets['one']]},
+    outlets={"datasets": [datasets['two']]}
 )
+
+run_this_last = BashOperator(
+    task_id='run_this_last', bash_command='echo 1', dag=dag,
+    inlets={"auto": True},
+    outlets={"datasets": [datasets['three']]}
+)
+
+run_this.set_downstream(run_this_last)
