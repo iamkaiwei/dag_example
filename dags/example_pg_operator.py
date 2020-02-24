@@ -26,7 +26,7 @@ CREATE TABLE {table_name} (
    lastname VARCHAR (50)
 );
 """
-tables = ['one', 'two', 'three']
+tables = ['one', 'two', 'three', 'four']
 
 for table in tables:
   operator = PostgresOperator(

@@ -22,7 +22,7 @@ dag = DAG(
 )
 
 datasets = {}
-tables = ['one', 'two', 'three']
+tables = ['one', 'two', 'three', 'four']
 for table in tables:
     data = { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': table }
     datasets[table] = Table(table, data)
@@ -39,4 +39,11 @@ run_this_last = BashOperator(
     outlets={"datasets": [datasets['three']]}
 )
 
+run_this_last2 = BashOperator(
+    task_id='run_this_last2', bash_command='echo 1', dag=dag,
+    inlets={"auto": True},
+    outlets={"datasets": [datasets['four']]}
+)
+
 run_this.set_downstream(run_this_last)
+run_this.set_downstream(run_this_last2)
