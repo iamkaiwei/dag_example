@@ -28,7 +28,7 @@ for table in tables:
     datasets[table] = Table(table, data)
 
 run_this = BashOperator(
-    task_id='run_me_first', bash_command='exit 123', dag=dag,
+    task_id='run_me_first', bash_command='echo 1', dag=dag,
     inlets={"datasets": [datasets['one']]},
     outlets={"datasets": [datasets['two']]}
 )
