@@ -18,16 +18,16 @@ from databuilder.transformer.base_transformer import NoopTransformer
 from databuilder.transformer.airflow_transformer import AirflowTransformer
 from databuilder.extractor.kafka_source_extractor import KafkaSourceExtractor
 
-neo_host = os.getenv('NEO_HOST', 'neo4j.default.svc.cluster.local')
+neo_host = os.getenv('NEO_HOST', 'neo4j.lineage.svc.cluster.local')
 neo4j_user = os.getenv('NEO_USER', 'neo4j')
 neo4j_password = os.getenv('NEO_PASS', 'test')
 
 NEO4J_ENDPOINT = 'bolt://{}:7687'.format(neo_host)
 neo4j_endpoint = NEO4J_ENDPOINT
 
-kafka_brokers = os.getenv('KAFKA_BROKERS', 'bootstrap.kafka.svc.cluster.local:9092')
+kafka_brokers = os.getenv('KAFKA_BROKERS', 'bootstrap.lineage.svc.cluster.local:9092')
 kafka_group_id = os.getenv('KAFKA_GROUP_ID', 'amundsen')
-kafka_topics = [os.getenv('KAFKA_TOPIC', 'airflow-sql')]
+kafka_topics = [os.getenv('KAFKA_TOPIC', 'lineage-airflow')]
 
 def random_string(stringLength=8):
     letters = string.ascii_lowercase

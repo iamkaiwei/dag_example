@@ -16,10 +16,10 @@ from databuilder.extractor.neo4j_extractor import Neo4jExtractor
 from databuilder.extractor.neo4j_search_data_extractor import Neo4jSearchDataExtractor
 from databuilder.loader.file_system_elasticsearch_json_loader import FSElasticsearchJSONLoader
 
-es_host = os.getenv('ES_HOST', 'elasticsearch.default.svc.cluster.local')
+es_host = os.getenv('ES_HOST', 'elasticsearch.lineage.svc.cluster.local')
 es = Elasticsearch([{'host': es_host}])
 
-neo_host = os.getenv('NEO_HOST', 'neo4j.default.svc.cluster.local')
+neo_host = os.getenv('NEO_HOST', 'neo4j.lineage.svc.cluster.local')
 neo4j_user = os.getenv('NEO_USER', 'neo4j')
 neo4j_password = os.getenv('NEO_PASS', 'test')
 
