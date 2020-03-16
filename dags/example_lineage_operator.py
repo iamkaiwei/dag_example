@@ -24,7 +24,7 @@ dag = DAG(
 datasets = {}
 tables = ['one', 'two', 'three', 'four']
 for table in tables:
-    data = { 'database': 'airflow', 'schema': 'airflow', 'cluster': 'gold', 'table': table }
+    data = { 'database': 'airflow', 'schema': 'public', 'cluster': 'gold', 'table': table }
     datasets[table] = Table(table, data)
 
 run_this = BashOperator(
