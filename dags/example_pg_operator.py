@@ -13,7 +13,7 @@ args = {
 dag = DAG(
     dag_id='example_pg_operator',
     default_args=args,
-    schedule_interval='0 0 * * *',
+    schedule_interval='@once',
     catchup=False
 )
 

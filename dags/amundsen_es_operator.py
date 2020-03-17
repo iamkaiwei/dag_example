@@ -181,7 +181,7 @@ def run_user_es_job():
 dag_args = {
     'concurrency': 10,
     # 4AM, 4PM PST
-    'schedule_interval': '0 11 * * *',
+    'schedule_interval': '@once',
     'catchup': False
 }
 
